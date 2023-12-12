@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     <div class="row ">
                         <div class="col noi-details-flight-number">
                             {{ flight.flightNumber }}
-                            <img :src="require('@/assets/icons/skyalpsl-full-alt.png')" />
+                            <img src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt-trasp.png" />
                         </div>
                     </div>
                     <div class="row">
