@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <template>
     <div :class="'container-flex noi-details-container '+device+ ' ' + options.theme"> <!-- :class="{hide: !show}" -->
         <div class="row" v-if="isMobile">
