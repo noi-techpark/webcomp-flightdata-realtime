@@ -130,7 +130,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     </div>
                                     <div class="col-md-9 noi-flight-row-logo">
                                         <a :href="airlineLink(flight)" target="_blank" title="Skyalps Home">
-                                            <img :src="require('@/assets/icons/skyalpsl-full-alt.png')" />
+                                            <img src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt.png" />
                                         </a><br/>
                                         <!-- <span>{{ $t("operatedBy") }} XXXXXX</span> -->
                                     </div>
