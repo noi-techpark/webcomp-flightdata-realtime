@@ -6,6 +6,7 @@ Source: https://github.com/noi-techpark/webcomp-boilerplate
 Files: |
     .github/* .gitignore LICENSE.md .pre-commit-config.yaml *.json .editorconfig
     .env.example wcs-logo.png src/assets/icons/odh.png src/assets/icons/1.png
-    public/favicon.ico src/assets/icons/odh.svg
+    public/favicon.ico src/assets/icons/odh.svg src/assets/icons/skyalpsl-full-alt-trasp.png
+    src/assets/icons/skyalpsl-full-alt.png
 Copyright: (c) NOI Techpark <digital@noi.bz.it>
 License: CC0-1.0
