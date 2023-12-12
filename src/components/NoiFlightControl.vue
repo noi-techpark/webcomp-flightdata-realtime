@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <div @click="closeDetails()"  v-if="(device != 'desktop' && details.show)">
                     <Icon class="noi-top-back-icon" icon="ep:arrow-left"/>
                 </div>
-                <img v-if="options.theme == 'skyalps'" :src="require('@/assets/icons/skyalpsl-full-alt-trasp.png')" />
+                <img v-if="options.theme == 'skyalps'" src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt-trasp.png" />
                 <img v-else :src="require('@/assets/icons/odh.svg')" />
             </div>
         </div>
