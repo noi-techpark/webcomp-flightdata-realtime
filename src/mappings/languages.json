@@ -1,0 +1,104 @@
+{
+  "de": {
+    "header":{
+        "title":"FLIGHT STATUS",
+        "description":"Entdecken Sie in Echtzeit die Informationen aller Flüge des ausgewählten Zeitraums mit Abflug/Ankunft"    
+    },
+    "backToList":"Zurück zur Flugliste",
+    "changeSearch":"Suche ändern",
+    "search":{
+        "airport":"Van / Bis / Flugnummer",
+        "period":"Zeitraum"
+    },
+    "periods":{
+        "day":"Tag",
+        "week":"Woche",
+        "month":"Monat"
+    },
+    "operatedBy": "Betrieben von",
+    "timeLeft": "Verbleibende Zeit",
+    "min": "min",
+    "arrived": "Angekommen",
+    "moreDetails": "Siehe Einzelheiten",
+    "estimatedArrival": "Erwartete Ankunft",
+    "from": "Von",
+    "to": "nach",
+    "allAirports": "Alle flughäfen",
+    "loading": "Wird geladen",
+    "gate": "Gate",
+    "status":{
+        "SCHEDULED": "GEPLANT",
+        "BOARDING": "EINSTEIGEN",
+        "LANDED": "GELANDET",
+        "IN_FLIGHT": "IM FLUG"
+    }
+  },
+  "it": {
+    "header":{
+        "title":"FLIGHT STATUS",
+        "description":"Scopri in tempo reale le informazioni di tutti i voli del periodo selezionato in partenza/arrivo da"    
+    },
+    "backToList":"Torna alla lista voli",
+    "changeSearch":"Cambia ricerca",
+    "search":{
+        "airport":"Da / A / Numero volo",
+        "period":"Periodo"
+    },
+    "periods":{
+        "day":"Giorno",
+        "week":"Settimana",
+        "month":"Mese"
+    },
+    "operatedBy": "Operato da",
+    "timeLeft": "Tempo rimanente",
+    "min": "min",
+    "arrived": "Arrivato",
+    "moreDetails": "Vedi dettagli",
+    "estimatedArrival": "Arrivo previsto",
+    "from": "Da",
+    "to": "a",
+    "allAirports": "Tutti gli aeroporti",
+    "loading": "Caricamento",
+    "gate": "Gate",
+    "status":{
+        "SCHEDULED": "PIANIFICATO",
+        "BOARDING": "IMBARCO",
+        "LANDED": "ATTERRATO",
+        "IN_FLIGHT": "IN VOLO"
+    }
+  },
+  "en": {
+    "header":{
+        "title":"FLIGHT STATUS",
+        "description":"Discover in real time the information of all flights in the chosen period from/to"    
+    },
+    "backToList":"Return to flight list",
+    "changeSearch":"Change search",
+    "search":{
+        "airport":"From / To / Flight number",
+        "period":"Period"
+    },
+    "periods":{
+        "day":"Day",
+        "week":"Week",
+        "month":"Month"
+    },
+    "operatedBy": "Operated by",
+    "timeLeft": "Time left",
+    "min": "min",
+    "arrived": "Arrived",
+    "moreDetails": "More details",
+    "estimatedArrival": "Estimated arrival",
+    "from": "From",
+    "to": "to",
+    "allAirports": "All airports",
+    "loading": "Loading",
+    "gate": "Gate",
+    "status":{
+        "SCHEDULED": "SCHEDULED",
+        "BOARDING": "BOARDING",
+        "LANDED": "LANDED",
+        "IN_FLIGHT": "IN FLIGHT"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+/*
+* SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+* 
+* SPDX-License-Identifier: CC0-1.0
+*/
+
+.noi-flightdata-realitime #noi-flights-results-list .noi-flights-results-row .noi-flight-row-path .noi-flight-row-plane-line div.after{
+    /* border-top:2px solid #eeeeee; */
+}
+
+@media screen and (max-width: 1300px) {
+    
+}

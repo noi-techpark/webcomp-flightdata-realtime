@@ -1,48 +1,132 @@
 {
-  "title": "Hello-world",
-  "shortName": "hello-world-2",
-  "description": "Hello world simple webcomp example",
-  "descriptionAbstract": "Hello world simple webcomp example",
-  "license": "AGPL-3.0-or-later",
-  "repositoryUrl": "https://your-repository.git",
-  "copyrightHolders": [
-    {
-      "name": "NOI",
-      "email": "info@noi.bz.it",
-      "organization": "NOI S.p.A",
-      "organizationUrl": "https://noi.bz.it"
-    }
-  ],
-  "authors": [
-    {
-      "name": "...",
-      "email": "...",
-      "organization": "...",
-      "organizationUrl": "..."
-    }
-  ],
-  "image": "wcs-logo.png",
-  "searchTags": [],
-  "dist": {
-    "basePath": "dist",
-    "files": [
-      "webcomp-boilerplate.min.js"
-    ],
-    "scripts": [
-    ]
-  },
-  "configuration": {
-    "tagName": "hello-world",
-    "options": [
+    "title": "Webcomponent: Flightdata realtime",
+    "shortName": "Flightdata realtime",
+    "description": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
+    "descriptionAbstract": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
+    "license": "AGPL-3.0-or-later",
+    "repositoryUrl": "https://github.com/noi-techpark/webcomp-flightdata-realtime.git",
+    "copyrightHolders": [
       {
-        "key": "title",
-        "type": "text",
-        "label": "title of the web-comp",
-        "required": false,
-        "options": {
-          "default": "hello-world"
-        }
+        "name": "NOI",
+        "email": "info@noi.bz.it",
+        "organization": "NOI S.p.A",
+        "organizationUrl": "https://noi.bz.it"
       }
-    ]
+    ],
+    "authors": [
+      {
+        "name": "Marco Dalle Feste",
+        "email": "marco@dallefeste.com",
+        "organization": "Marco Dalle Feste",
+        "organizationUrl": "https://dallefeste.com"
+      }
+    ],
+    "image": "wcs-logo.png",
+    "searchTags": [
+      "realtime",
+      "flightdata",
+      "skyalps",
+      "mqtt",
+      "websockets"
+    ],
+    "dist": {
+      "basePath": "dist",
+      "files": [
+        "noi-flightdata-realtime.min.js"
+      ],
+      "scripts": [
+        {
+          "file": "noi-flightdata-realtime.min.js",
+          "parameter": ""
+        }
+      ]
+    },
+    "configuration": {
+      "tagName": "noi-flightdata-realtime",
+      "options": [
+        {
+          "key": "language",
+          "type": "select",
+          "label": "Two letter key for the language to be used. Fallback is `en`",
+          "required": false,
+          "options": {
+            "values": [
+              "en",
+              "de",
+              "it"
+            ],
+            "default": "en"
+          }
+        },
+        {
+          "key": "localAirport",
+          "type": "textarea",
+          "label": "The IATA code of the local airport.",
+          "required": false,
+          "options": {
+            "default": "BZO"
+          }
+        },
+        {
+            "key": "showTopDescription",
+            "type": "select",
+            "label": "Show the top description",
+            "options": {
+            "values": [
+                "true",
+                "false"
+            ],
+            "default": "true"
+            }
+        },
+        {
+          "key": "langPack",
+          "type": "textarea",
+          "label": "Add a custom language pack to the defaults.",
+          "required": false,
+          "options": {
+            "default": "{}"
+          }
+        },
+        {
+          "key": "theme",
+          "type": "select",
+          "label": "Color presets",
+          "options": {
+            "values": [
+              "odh",
+              "skyalps"
+            ],
+            "default": "odh"
+          }
+        },
+        {
+          "key": "id",
+          "type": "text",
+          "label": "Unique Element Id (required if styleUrl is used)",
+          "required": false,
+          "options": {
+            "default": "fligtdata-booking"
+          }
+        },
+        {
+          "key": "styleUrl",
+          "type": "text",
+          "label": "External Stylesheet Url (...with cors enabled)",
+          "required": false,
+          "options": {
+            "default": ""
+          }
+        },
+        {
+          "key": "timezone",
+          "type": "text",
+          "label": "The local timezone.",
+          "required": false,
+          "options": {
+            "default": "Europe/Berlin"
+          }
+        }
+      ]
+    }
   }
-}
