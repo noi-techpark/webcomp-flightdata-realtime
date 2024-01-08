@@ -15,6 +15,7 @@
         "week":"Woche",
         "month":"Monat"
     },
+    "update": "Aktualisieren",
     "operatedBy": "Betrieben von",
     "timeLeft": "Verbleibende Zeit",
     "min": "min",
@@ -49,6 +50,7 @@
         "week":"Settimana",
         "month":"Mese"
     },
+    "update": "Aggiorna",
     "operatedBy": "Operato da",
     "timeLeft": "Tempo rimanente",
     "min": "min",
@@ -83,6 +85,7 @@
         "week":"Week",
         "month":"Month"
     },
+    "update": "Update",
     "operatedBy": "Operated by",
     "timeLeft": "Time left",
     "min": "min",

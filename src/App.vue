@@ -18,11 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <script>
 import Vue from "vue"
-
-
 import NoiFlightControl from "./components/NoiFlightControl.vue"
-
-// TODO: 4MB (!) unused payload => https://github.com/ghettovoice/vuelayers/issues/319
 import { Map, TileLayer, OsmSource, Feature, Style } from 'vuelayers'
 
 Vue.use(Map)
@@ -92,9 +88,25 @@ export default {
           elem.shadowRoot.appendChild(externalStyles)
         })
         .catch((error) => {
-          console.error("wrong stylesheet url. styles can not be applied. cors disabled (?)")
+            console.error("wrong stylesheet url. styles can not be applied. cors disabled (?)")
         })
     }
+
+  },
+  created(){
+    // add default fonts
+    const fontOdh = document.createElement("link");
+    fontOdh.type = "text/css";
+    fontOdh.rel = "stylesheet";
+    fontOdh.href = "https://fonts.testingmachine.eu/source-sans-pro/style.css";
+    document.head.appendChild(fontOdh);
+    const fontSkyalps = document.createElement("link");
+    fontSkyalps.type = "text/css";
+    fontSkyalps.rel = "stylesheet";
+    fontSkyalps.href = "https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@300&display=swap";
+    document.head.appendChild(fontSkyalps);
   }
+
+
 }
 </script>

@@ -14,11 +14,12 @@ SPDX-License-Identifier: CC0-1.0
   <link rel="shortcut icon" href="/favicon.ico">
   <title>Skyalps live flight status</title>
 
-  <script src="./dist/noi-flightdata-realitime.js"></script>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@300&display=swap" rel="stylesheet">
+  <script src="./dist/noi-flightdata-realtime.js"></script>
+  <!-- <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@300&display=swap" rel="stylesheet"> --> 
 
   <style>
+
     html,
     body{
         height: 100%;
@@ -38,7 +39,7 @@ SPDX-License-Identifier: CC0-1.0
         --noi-text-primary: black;
         --noi-text-secondary: white;
         --noi-light-bg: #F5F4F6;
-        --noi-font-family: 'Barlow Semi Condensed';
+        /* --noi-font-family: 'Barlow Semi Condensed'; */
         --basic-font-size: 16px;
     }
 
@@ -48,15 +49,15 @@ SPDX-License-Identifier: CC0-1.0
 <body style="width: 100%; height: 100%; padding:2% 5%; background-color: gray;">
     Skyalps live flight status
     <div style="width: 100%; height: 100%; padding:30px 0">
-    <noi-flightdata-realitime theme="odh"
+    <noi-flightdata-realtime theme="odh"
                             showTopDescription="true"
-                            langPack='{ "es" : { "periods": {  "day": "By days", "week": "By weeks"  } } }'
-                            styleUrl="./demo-assets/custom.css"
+                            langPack='{ "en" : { "periods": {  "day": "By days", "week": "By weeks"  } } }'
+                            styleUrl="./demo-assets/custom.scss"
                             id="atc-main"
                             language="it"
                             localAirport="BZO"
                             timezone="Europe/Berlin">
-    </noi-flightdata-realitime>
+    </noi-flightdata-realtime>
     <script>
       // whenever the filter attribute changes, the widget will update internal data
       // var flightdataRealtimeElement = document.querySelector("noi-flightdata-realitime");

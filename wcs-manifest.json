@@ -24,10 +24,8 @@
     "image": "wcs-logo.png",
     "searchTags": [
       "realtime",
-      "flightdata",
-      "skyalps",
-      "mqtt",
-      "websockets"
+      "flights",
+      "skyalps"
     ],
     "dist": {
       "basePath": "dist",
