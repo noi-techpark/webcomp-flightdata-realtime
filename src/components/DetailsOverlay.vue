@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <template>
     <div :class="'container-flex noi-details-container '+device+ ' ' + options.theme"> <!-- :class="{hide: !show}" -->
         <div class="row" v-if="isMobile">
@@ -12,6 +17,11 @@
                         <div class="col noi-details-status" :class="flight.flightInfo['colorClass']">
                             {{ $parent.$t("status."+flight.flightInfo["text"]) }}
                         </div>
+                        <div class="col update-button" >
+                            <div @click="$parent.refreshData" class="button light">
+                                <Icon icon="mdi:refresh"  :horizontalFlip="true"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="noi-details-description-container-top">
@@ -23,7 +33,7 @@
                     <div class="row ">
                         <div class="col noi-details-flight-number">
                             {{ flight.flightNumber }}
-                            <img :src="require('@/assets/icons/skyalpsl-full-alt.png')" />
+                            <img src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt-trasp.png" />
                         </div>
                     </div>
                     <div class="row">
@@ -46,7 +56,9 @@
                                     <Icon icon="tabler:point-filled"/>
                                 </div>
                                 <div class="plane">
-                                    <Icon icon="material-symbols:flight" rotate="90deg" />
+                                    <img v-if="options.theme == 'skyalps'" :src="require('@/assets/icons/plane-big-blue.png')" height="24px"/>
+                                    <img v-else :src="require('@/assets/icons/plane-big-black.png')" height="24px"/>
+                                    <!-- <Icon icon="material-symbols:flight" rotate="90deg" /> -->
                                 </div>
                                 <div class="after">
                                     <Icon icon="tabler:point"/>
@@ -81,7 +93,7 @@
                             {{ flight.departure.airport.name }} ({{ flight.departure.airport.iataCode }})
                         </div>
                         <div class="col-4">
-                            {{ $parent.$t("gate") }} -
+                            <span v-if="flight.departure.airport.gate">{{ $parent.$t("gate") }} {{ flight.departure.airport.gate }}</span>
                         </div>
                     </div>
                     <div class="row noi-details-from-to">
@@ -92,13 +104,13 @@
                             {{ flight.arrival.airport.name }} ({{ flight.arrival.airport.iataCode }})
                         </div>
                         <div class="col-4">
-                            {{ $parent.$t("gate") }} -
+                            <span v-if="flight.arrival.airport.gate">{{ $parent.$t("gate") }} {{ flight.arrival.airport.gate }}</span>
                         </div>
                     </div>
                 </div>
   
             </div>
-            <div class="col-md-8  order-1 order-md-2 noi-details-map-container">
+            <div class="col-md-8 order-1 order-md-2 noi-details-map-container">
                 <div ref="viewport" style="width: 100%; height: 100%; min-height: 250px; position: relative" >            
                     <vl-map ref="map"
                             :load-tiles-while-animating="true"
@@ -124,18 +136,16 @@
                         <vl-feature>
                             <vl-geom-point :coordinates="getLineCoordinates(flight).plane"></vl-geom-point>
                             <vl-style-box>
-                                <vl-style-icon :src="emitter_types[0][1]"
-                                            :scale="emitter_types[0][3]"
-                                            :rotation="emitter_types[0][4]
-                                                ? 0
-                                                : ((flight.angle -
-                                                    emitter_types[0][2]) *
-                                                    3.14 *
-                                                    2) /
-                                                360
-                                                "
+                                <vl-style-icon v-if="options.theme == 'skyalps'" :src="require('@/assets/icons/plane-big-blue.png')"
+                                            :scale="0.4"
+                                            :rotation="((flight.angle) * Math.PI * 2)/360"
                                             :anchor="[0.5, 0.5]">
-
+                                        <vl-style-fill :color="strokeColor"></vl-style-fill>
+                                </vl-style-icon>
+                                <vl-style-icon v-else :src="require('@/assets/icons/plane-big-black.png')"
+                                            :scale="0.4"
+                                            :rotation="((flight.angle) * Math.PI * 2)/360"
+                                            :anchor="[0.5, 0.5]">
                                         <vl-style-fill :color="strokeColor"></vl-style-fill>
                                 </vl-style-icon>
                             </vl-style-box>
@@ -211,7 +221,6 @@
         },
         data() {
             return {
-                emitter_types: require("../mappings/sender_types.js"),
                 map: {
                     zoom: 5.5,
                     current_tiles: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -230,42 +239,28 @@
         },
         computed: {
             isMobile(){
-                return (this.device != 'desktop');
+                return (this.device == 'smartphone' || this.device == 'tablet');
             }
         },
 
-        //component whatcers
-        watch: {
-            "flight": function () {
-                console.log("SHOW CHANGED, calling resizer")
-                this.handleResizeEvent()
-            }
-        },
         created: function () {
-            window.addEventListener("resize", this.handleResizeEvent)
-        },
-        destroyed() {
-            window.removeEventListener("resize", this.handleResizeEvent)
-        },
-
-        mounted: function () {
-            this.flight.angle = this.getFlightAngle(this.flight)
-            this.map.center = this.getCenterCoordinates(this.flight);
-            this.fitZoom(this.flight);
-
             this.fillColor = 'white';
             this.strokeColor = 'black';
             if(this.options.theme == 'skyalps'){
                 this.strokeColor = '#004988';
             }
         },
+        mounted: function () {
+            this.flight.angle = this.getFlightAngle(this.flight)*1 + 90
+            this.map.center = this.getCenterCoordinates(this.flight);
+            this.fitZoom(this.flight);
+        },
 
         methods: {
             getFlightAngle(flight){
-                let dx = (flight.arrival.airport.coordinates[0]-flight.departure.airport.coordinates[0]);
-                let dy = (flight.arrival.airport.coordinates[1]-flight.departure.airport.coordinates[1]);
-                let angle = Math.atan2(dx,dy)*180.0/Math.PI;
-                console.log(angle)
+                let dx = (flight.arrival.airport.coordinates[0]*1.0-flight.departure.airport.coordinates[0]*1.0);
+                let dy = (flight.arrival.airport.coordinates[1]*1.0-flight.departure.airport.coordinates[1]*1.0);
+                let angle = (Math.atan2(dx,dy)*180.0)/Math.PI;
                 return angle;
             },
             reduceCoordinates(coordinates,which,offset){
@@ -320,16 +315,6 @@
                 coordinates.push([airportCorrdinates[0],airportCorrdinates[1]]);
                 return coordinates;
             },
-            handleResizeEvent: function () {
-                const wi = this.$refs.viewport.clientWidth
-                this.device = "desktop"
-                if (wi < 768) this.device = "tablet"
-                if (wi < 480) this.device = "smartphone"
-
-                this.$refs.map.updateSize()
-            },
-
-
             adjust_map_zoom(evt,x1, y1, x2, y2) {
                 const map = evt.map
             },
@@ -342,7 +327,7 @@
                     distance = 1;
                 }
                 let zoom = 38/distance;
-                if(this.device != "desktop"){
+                if(this.isMobile){
                     zoom = zoom*0.8;
                 }
 
@@ -403,7 +388,7 @@
         }
 
         // mobile
-        &.smartphone, &.tablet{
+        &.smartphone, &.tablet{ 
             margin-bottom:0;
             padding-bottom:1rem;
 
@@ -419,6 +404,19 @@
 
 
             .noi-details-description-container{
+
+                .update-button{
+                    display: inline;
+                    text-align: right;
+                    padding-top: 0.5rem;
+                    .button{
+                        font-size: 1.5rem;
+                        background-color: transparent;
+                        max-width: fit-content;
+                        padding:0.2rem 0.4rem 0.4rem 0.5rem;
+                    }
+                }
+                
                 .noi-details-description-container-top{
                     .noi-details-flight-number{
                         img{
