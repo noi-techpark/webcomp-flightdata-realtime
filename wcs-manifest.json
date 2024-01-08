@@ -1,6 +1,6 @@
 {
     "title": "Webcomponent: Flightdata realtime",
-    "shortName": "Flightdata realtime",
+    "shortName": "flightdata-realtime",
     "description": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
     "descriptionAbstract": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
     "license": "AGPL-3.0-or-later",

@@ -3,8 +3,8 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "serve": "npm run vcbuild -- --target wc --name noi-flightdata-realitime src/App.vue --watch --inline-vue",
-    "build": "npm run vcbuild -- --target wc --name noi-flightdata-realitime src/App.vue --inline-vue",
+    "serve": "npm run vcbuild -- --target wc --name noi-flightdata-realtime src/App.vue --watch --inline-vue",
+    "build": "npm run vcbuild -- --target wc --name noi-flightdata-realtime src/App.vue --inline-vue",
     "lint": "vue-cli-service lint",
     "test": "mocha --reporter list",
     "start": "npm run serve",
