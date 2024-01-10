@@ -56,8 +56,8 @@ export default {
     },
     theme: {
       type: String,
-      // "odh" || "skyalps"
-      default: "odh"
+      // "OpenDataHub" || "skyalps"
+      default: "OpenDataHub"
     },
     timezone: {
       type: String,

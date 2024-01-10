@@ -26,7 +26,7 @@ Include vue.js (https://unpkg.com/vue) and the webcompscript file `dist/noi-flig
 
 ```html
 <noi-flightdata-realitime 
-    theme="odh"
+    theme="OpenDataHub"
     showTopDescription="true"
     langPack="{}"
     styleUrl="./demo-assets/custom.css"
@@ -71,7 +71,7 @@ Options: "true", "false"
 This attribute can be used to apply a predefined set of colors.
 
 Type: string<br>
-Options: "odh", "skyalps"
+Options: "OpenDataHub", "Skyalps"
 
 
 #### styleUrl
