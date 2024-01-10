@@ -3,18 +3,17 @@ SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-
 <template>
   <div :class="'noi-flightdata-realitime global ' + device + ' ' + options.theme" v-show="options" ref="viewport" style="width: 100%;  position: relative;"> <!-- height: 100%; min-height:200px; -->
 
     <div class="container-fluid">
         <div class="row noi-top-bar">
             <div class="col">
-                <div @click="closeDetails()"  v-if="(device != 'desktop' && details.show)">
+                <div @click="closeDetails()"  v-if="(isMobile && details.show)">
                     <Icon class="noi-top-back-icon" icon="ep:arrow-left"/>
                 </div>
                 <img v-if="options.theme == 'skyalps'" src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt-trasp.png" />
-                <img v-else :src="require('@/assets/icons/odh.svg')" />
+                <img v-else src="https://third-party.opendatahub.com/opendatahub-logo/OpenDataHub-Logo-Black-nospace-01.svg" />
             </div>
         </div>
         <div class="row noi-description-bar" v-if="options.showTopDescription && !showResults && !details.show" :class="{'pt-2': showResults}">
@@ -26,23 +25,45 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     </div>
 
     <div class="noi-content-container">
-        <div class="noi-details-back" v-if="details.show && device == 'desktop'">
-            <span @click="closeDetails()"><Icon icon="ep:arrow-left" /> {{ $t("backToList") }}</span>
+        <div class="noi-details-back" v-if="details.show && !isMobile">
+            <div class="row justify-content-md-center text-center">
+                <div class="col-md-6 col-sm-12">
+                    <div class="search-details">
+                        <span @click="closeDetails()"><Icon icon="ep:arrow-left" /> {{ $t("backToList") }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="update-button">
+                        <div @click="refreshData" class="button light">{{ $t("update") }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- search container -->
-        <div class="noi-change-search " v-if="device =='desktop'" :class="{'noi-hide': (!showResults || details.show)}">
-            <span @click="toggleSearchPanel()">
-                {{ $t("changeSearch") }}
-                <Icon icon="ep:arrow-up" :class="{close: !openSearchPanel}"/>
-            </span>
+        <div class="noi-change-search " v-if="device =='desktop' || device =='small-desktop'" :class="{'noi-hide': (!showResults || details.show)}">
+            <div class="row justify-content-md-center text-center">
+                <div class="col-md-6 col-sm-12">
+                    <div class="search-details">
+                        <span @click="toggleSearchPanel()">
+                            {{ getShownSearchText }} <Icon icon="prime:pencil"/>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="update-button">
+                        <div @click="refreshData" class="button light">{{ $t("update") }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="noi-search-fields-container" :class="{close: (showResults && !openSearchPanel), 'noi-hide':details.show}">
-            <form @submit.prevent="search"  autocomplete="off">
+            <form @submit.prevent="refreshData"  autocomplete="off">
                 
-                <div class="container">
+                <div class="container-xxl">
                     <div class="row justify-content-md-center text-center">
-                        <div class="col-md-4 col-sm-12">
+                        <div class="noi-col-4 noi-col-sd-5 noi-col-mob-12 py-2">
+                        <!-- <div class="col-xl-4 col-lg-4 col-md-5 col-sm-12"> -->
                             <airports-dropdown 
                                 @clicked="onAirportSelect" 
                                 @searchTextChanged="handleAirportSearchTextChange"
@@ -52,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             </airports-dropdown>
                         </div>
                             
-                        <div class="col-md-2 col-sm-12 form-floating">
+                        <div class="noi-col-2 noi-col-sd-3 noi-col-mob-12 form-floating py-2">
                             <period-dropdown 
                                 @clicked="onPeriodSelect" 
                                 :elements="periods" 
@@ -61,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             </period-dropdown>
                         </div>
 
-                        <div class="col-md-2 col-sm-12">
+                        <div class="noi-col-2 noi-col-sd-3 noi-col-mob-12 py-2">
                             <input type="submit" class="button" value="View details" />
                         </div>
                     </div>
@@ -78,65 +99,84 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
             <!-- results list -->
             <div v-if="showResults" :class="{'noi-hide': details.show}">
+
+                <!-- top calendar bar -->
+                <div class="noi-top-navigator-container">
+                    <div class="container-flex">
+                        <div class="noi-horizontal-calendar-container">
+                            <hooper 
+                                ref="hooper"
+                                :itemsToShow="4" 
+                                :centerMode="false"
+                                :wheelControl="false"
+                                :initialSlide="this.getTimeInterval">
+                                    <slide v-for="(el, index) in calendarElements" :key="index" class="noi-horizontal-calendar-element" :class="{selected: selectedTimeIntervalIndex == index, day:period == 'day'}">
+                                        <div @click="handleCalendarElementClick(index,el)" >{{ el.label }} <span>{{ el.subLabel }}</span></div>
+                                    </slide>
+                                <hooper-navigation slot="hooper-addons" class="lg-only"></hooper-navigation>
+                            </hooper>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- mobile change search link -->
+                <div class="noi-change-search sm-only" :class="{'noi-hide': (!showResults || details.show)}">
+                    <div class="search-details">
+                        <span @click="mobileChangeSearch()">
+                            {{ getShownSearchText }} <Icon icon="prime:pencil"/>
+                        </span>
+                    </div>
+                    <div class="update-icon" @click="refreshData">
+                        <Icon icon="mdi:refresh"  :horizontalFlip="true"/>
+                    </div>
+                </div>
+                
                 <div class="noi-loader-results-container" v-if="loadingResults">
                     <div class="text-center">
-                        <div class="spinner-grow" role="status" style="width: 3rem; height: 3rem;">
-                            <span class="visually-hidden">
-                                {{ $t("loading") }}...
-                            </span>
+                        <div class="placeholder-content">
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item"></div>
+                            <div class="placeholder-content_item" v-if="!isMobile"></div>
+                            <div class="placeholder-content_item" v-if="!isMobile"></div>
+                            <div class="placeholder-content_item" v-if="!isMobile"></div>
+                            <div class="placeholder-content_item" v-if="!isMobile"></div>
                         </div>
                     </div>
                 </div>
                 <div v-else>
         
-                    <!-- top calendar bar -->
-                    <div class="noi-top-navigator-container">
-                        <div class="container-flex">
-                            <div class="noi-horizontal-calendar-container">
-                                <hooper 
-                                    ref="hooper"
-                                    :itemsToShow="4" 
-                                    :centerMode="false"
-                                    :wheelControl="false"
-                                    :initialSlide="this.getTimeInterval">
-                                        <slide v-for="(el, index) in calendarElements" :key="index" class="noi-horizontal-calendar-element" :class="{selected: selectedTimeIntervalIndex == index, day:period == 'day'}">
-                                            <div @click="handleCalendarElementClick(index,el)" >{{ el.label }} <span>{{ el.subLabel }}</span></div>
-                                        </slide>
-                                    <hooper-navigation slot="hooper-addons" class="lg-only"></hooper-navigation>
-                                </hooper>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- mobile change search link -->
-                    <div class="noi-change-search sm-only" :class="{'noi-hide': (!showResults || details.show)}">
-                        <span @click="mobileChangeSearch()">
-                            {{ $t("changeSearch") }} 
-                            <Icon icon="ep:arrow-up" :class="{close: !openSearchPanel}"/>
-                        </span>
-                    </div>
-        
                     <!-- results -->
-                    <div class="container-flex noi-flights-results-list" v-if="lastFlights.length > 0">
+                    <div class="container-flex noi-flights-results-list" v-if="flights[selectedTimeIntervalIndex] && flights[selectedTimeIntervalIndex].length > 0">
                         <div class="row noi-flights-results-row" 
-                            v-for="flight in lastFlights" :key="flight.key" :class="flight.flightInfo['colorClass']"
-                            @click="evaluateMobileClick(flight)"  >
+                            v-for="(flight,index) in flights[selectedTimeIntervalIndex]" :key="index" :class="flight.flightInfo['colorClass']"
+                            @click="evaluateMobileClick(index,flight)"  >
                             
                             <!-- desktop -->
-                            <div class="col-md-2 lg-only">
+                            <div class=" col-lg-2 col-md-1 lg-only">
                                 <div class="row">
-                                    <div class="col-md-3 noi-flight-row-status-badge">
+                                    <div class="col-lg-3 col-md-12 noi-flight-row-status-badge">
                                         <Icon :icon="flight.flightInfo['iconClass']" :class="flight.flightInfo['colorClass']" />
                                     </div>
-                                    <div class="col-md-9 noi-flight-row-logo">
+                                    <div class="col-lg-9 col-md-9 noi-flight-row-logo d-md-none d-lg-block">
                                         <a :href="airlineLink(flight)" target="_blank" title="Skyalps Home">
-                                            <img src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt.png" />
+                                            <img src="https://third-party.opendatahub.com/webcomp-flightdata-realtime/src/assets/icons/skyalpsl-full-alt-trasp.png" />
                                         </a><br/>
                                         <!-- <span>{{ $t("operatedBy") }} XXXXXX</span> -->
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 lg-only">
+                            <div class="col-lg-6 col-md-6 lg-only">
                                 <div class="row">
                                     <div class="col-md-3 noi-flight-row-airport departure">
                                         <div><div class="noi-flight-row-badge">{{ flight.departure.airport.iataCode }}</div> <span>{{ flight.departure.airport.name }}</span></div><br/>
@@ -146,7 +186,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                         <div class="noi-flight-row-plane-line" :class="flight.flightInfo['planeLineClass']">
                                             <div class="before"></div>
                                             <div class="plane">
-                                                <Icon icon="material-symbols:flight" rotate="90deg" />
+                                                <img v-if="options.theme == 'skyalps'" :src="require('@/assets/icons/plane-big-blue.png')" height="24px"/>
+                                                <img v-else :src="require('@/assets/icons/plane-big-black.png')" height="24px"/>
+                                                <!-- <Icon icon="material-symbols:flight" rotate="90deg" /> -->
                                             </div>
                                             <div class="after"></div>
                                         </div>
@@ -158,7 +200,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 lg-only">
+                            <div class="col-lg-4 col-md-5 lg-only">
                                 <div class="row">
                                     <div class="col-md-3 noi-flight-row-flight-number">
                                         {{ flight.flightNumber }}
@@ -168,7 +210,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                         <!-- <span class="details">{{ $t("arrived") }} XX:YY</span> -->
                                     </div>
                                     <div class="col-md-5 noi-flight-row-button">
-                                        <div @click="openDetails(flight)" class="button light">{{ $t("moreDetails") }}</div>
+                                        <div @click="openDetails(index,flight)" class="button light">{{ $t("moreDetails") }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +222,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                 <div><span class="hour">{{ asZoneTime(flight.departure.time) }} - {{ asZoneTime(flight.arrival.time) }}</span></div>
                                 <div class="noi-flight-row-status">
                                     <span class="status" :class="flight.flightInfo['colorClass']">{{ $t("status."+flight.flightInfo["text"]) }}</span>
-                                    <span class="message">{{ $t("estimetedArrival") }} XX:YY</span>
+                                    <span class="message" v-if="flight.arrival.estimatedTime">{{ $t("estimatedArrival") }} {{ asZoneTime(flight.arrival.estimatedTime) }}</span>
                                 </div>
                             </div>
 
@@ -190,7 +232,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         </div>
                     </div>
                     <div v-else>
-                        Nessun volo trovato.
+                        <div class="noi-flights-any-result">
+                            <p><strong>Sorry, no result on this date.</strong></p>
+                            <p>There are no flights available, choose another date or <strong><u>restart the search</u></strong>.</p>
+                        </div>
                     </div>
                     
         
@@ -203,7 +248,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     <!-- footer -->
     <div class="footer">
-        Powered by Open Data Hub <a href="https://opendatahub.com" target="_blank"><img :src="require('@/assets/icons/odh.png')" height="25px" style="display: inline-block; margin-left: 10px" /></a>
+        Powered by Open Data Hub <a href="https://opendatahub.com" target="_blank"><img src="https://third-party.opendatahub.com/opendatahub-logo/OpenDataHub-Logo-Black-nospace-01.svg" height="25px" style="display: inline-block; margin-left: 10px" /></a>
     </div>
     
 
@@ -223,6 +268,7 @@ import PeriodDropdown from './PeriodDropdown.vue';
 import DetailsOverlay from './DetailsOverlay.vue';
     
 import {Hooper, Slide,Navigation as HooperNavigation} from 'hooper';
+import { toStringHDMS } from "ol/coordinate";
 
 export default {
    components:{AirportsDropdown,PeriodDropdown,Hooper,HooperNavigation, Slide,Icon,DetailsOverlay},
@@ -241,25 +287,27 @@ export default {
         setTimeout(()=>{
             const wi = this.$refs.viewport.clientWidth
             this.device = "desktop"
+            if (wi < 1200) this.device = "small-desktop"
             if (wi < 768) this.device = "tablet"
-            if (wi < 480) this.device = "smartphone"
-      
-            console.log("wi",wi)
-            console.log("wi",wi)
-            console.log("wi",wi)
-            console.log("this.device",this.device)
+            if (wi < 576) this.device = "smartphone"
         })
     },
     closeDetails(){
         this.details.flight = {};
         this.details.show = false;
-    },
-    evaluateMobileClick(flight){
-        if(this.device != 'desktop'){
-            this.openDetails(flight);
+        
+        const hop = this.$refs.hooper
+        if(hop){
+            hop.restart();
         }
     },
-    openDetails(flight){
+    evaluateMobileClick(openDetails,flight){
+        if(this.device != 'desktop'){
+            this.openDetails(openDetails,flight);
+        }
+    },
+    openDetails(flightIndex,flight){
+        this.details.flightIndex = flightIndex;
         this.details.flight = flight;
         this.details.show = true;
     },
@@ -267,28 +315,28 @@ export default {
         this.showResults = false;
     },
     toggleSearchPanel(){
-        this.openSearchPanel = !this.openSearchPanel
+        this.showResults = false;
+        // this.openSearchPanel = !this.openSearchPanel
     },
     handleCalendarElementClick(index,el){
         this.selectedTimeIntervalIndex = index;
-        this.search();
     },
     handleAirportSearchTextChange(val){
         this.airportSelectFieldValue = val;
     },
     onAirportSelect(el){
-        console.log(el)
         this.airport = el;
-        console.log("EXTERNAL departure HANDLER",'value: ' + el.value, ' label: ' + el.label);
     },
     onPeriodSelect(el){
         this.period = el;
-
         this.selectedTimeIntervalIndex = this.getDefaultTimeInterval;
         const hop = this.$refs.hooper
-        hop.slideTo(this.selectedTimeIntervalIndex);
-
-        console.log("EXTERNAL period HANDLER",'value: ' + el.value, ' label: ' + el.label);
+        if(hop){
+            hop.slideTo(this.selectedTimeIntervalIndex);
+        }
+        // if(this.showResults){
+        //     this.search()
+        // }
     },
     airlineLink(flight) {
         let dep = DateTime.fromFormat(flight.departure.date, "yyyy-LL-dd", "UTC")
@@ -379,14 +427,14 @@ export default {
         }
     },
 
+    async refreshData(){
+        this.search();
+    },
     async search(){
-        console.log("airportSelectFieldValue",this.airportSelectFieldValue)
-
         //form validation
         let formValidationResponse = this.validateForm();
         if(formValidationResponse.result == false){
             let validatedFormErrors = formValidationResponse.errors;
-            console.log("validatedFormErrors",validatedFormErrors)
             return false;
         }
 
@@ -409,7 +457,13 @@ export default {
         return where += condition;
     },  
     parseData: function(data){
-        let parsedData = data.data.data.map((o) => {
+
+        let parsedData = {};
+        // let parsedData = data.data.data.map((o) => {
+
+        for(let i = 0; i< data.data.data.length; i++){
+            let o = data.data.data[i];
+
             let datetimeDeparture = DateTime.fromFormat( o.smetadata.fltsfromperiod + " " + o.smetadata.std, "yyyy-LL-dd T",{ zone: "UTC" })
             let datetimeArrival = DateTime.fromFormat( o.smetadata.fltstoperiod + " " + o.smetadata.sta, "yyyy-LL-dd T",{ zone: "UTC" })
 
@@ -437,21 +491,25 @@ export default {
             let obj = {
                 departure:{
                     date:o.smetadata.fltsfromperiod.replace(/\//g, "-"),
+                    estimatedTime:null,//TODO: map with future received data 
                     time:o.smetadata.std,
                     timestamp:o.smetadata.departure_timestamp,
                     airport:{
                         iataCode:o.smetadata.fromdestination,
                         name:this.airports[o.smetadata.fromdestination].name,
+                        gate:null, //TODO: map with future received data 
                         coordinates:this.airports[o.smetadata.fromdestination].pos
                     }
                 },
                 arrival:{
                     date:o.smetadata.fltstoperiod.replace(/\//g, "-"),
+                    estimatedTime:null,//TODO: map with future received data 
                     time:o.smetadata.sta,
                     timestamp:o.smetadata.arrival_timestamp,
                     airport:{
                         iataCode:o.smetadata.todestination,
                         name:this.airports[o.smetadata.todestination].name,
+                        gate:null, //TODO: map with future received data 
                         coordinates:this.airports[o.smetadata.todestination].pos
                     }
                 },
@@ -464,26 +522,37 @@ export default {
             let flightInfo = this.getFlightInfo(obj);
             obj.flightInfo = flightInfo;
 
-            return obj;
-        })
+            let k = this.getClusterIndexByDate(obj.departure.date);
+            if(k === false){
+                continue; // skip it, is out of range
+            }
 
-        // sort by timestamps
-        parsedData.sort(this.sortByTimestamp)
-
-        // group by key, keep newest entry/key
-        let sflights = {}
-
-        //client side parsing
-        for (let i = 0; i < parsedData.length; i++) {
-            let arr = parsedData[i]
-            const key = arr.departure.date + "-" + arr.flightNumber + "-" + arr.arrival + "-" + arr.departure
-            if (typeof sflights[key] == "undefined") sflights[key] = []
-            sflights[key] = arr
+            if(!parsedData[k]){
+                parsedData[k] = [];
+            }
+            parsedData[k].push(obj)
         }
 
-        //copy obj due to decouple
-        parsedData = Object.values(sflights).sort(this.sortByDateTime)
+        // sort by timestamps
+        for(let k in parsedData){
+            parsedData[k].sort(this.sortByTimestamp)
+        }
+
+        // This is not the best way if list change. Could be necessary to implement an unique binding key.
+        if(this.details.show){
+            this.details.flight = parsedData[this.selectedTimeIntervalIndex][this.details.flightIndex];
+        }
+
         return parsedData
+    },
+    getClusterIndexByDate(date){
+        for(let k in this.calendarElements){
+            if(date>= this.calendarElements[k].minDate.toFormat('yyyy-MM-dd') && date<= this.calendarElements[k].maxDate.toFormat('yyyy-MM-dd')){
+                return k;
+            }
+        }
+        
+        return false;
     },
     async getData(whereCondition){
         //compile get parameters
@@ -499,7 +568,6 @@ export default {
         
         //make request
         let data = await axios.get(this.options.restEndpoint + params)
-        console.log("getData",params,data)
         return data;
     },
     async fetchSchedules() {
@@ -527,7 +595,6 @@ export default {
                 if(!this.airport || (this.airport.label != this.airportSelectFieldValue)){
                     // check if are there a flight number
                     let airportSelectFieldValue = this.airportSelectFieldValue;
-                    console.log("airportSelectFieldValue",airportSelectFieldValue)
                     if(airportSelectFieldValue){
                         where = this.addWhereCondition(where,"smetadata.fltnumber.eq."+airportSelectFieldValue);
                     }
@@ -538,11 +605,26 @@ export default {
             // handle dates
             let calendarElement = this.calendarElements[this.selectedTimeIntervalIndex];
             if(calendarElement){
-                let dateLowerLimit = new Date(calendarElement.minDate)
-                let dateUpperLimit = new Date(calendarElement.maxDate);
-                dateUpperLimit.setDate(dateUpperLimit.getDate() + 1);
-                where = this.addWhereCondition(where,"smetadata.departure_timestamp.gt."+dateLowerLimit.getTime()/1000);
-                where = this.addWhereCondition(where,"smetadata.departure_timestamp.lt."+dateUpperLimit.getTime()/1000);
+                let minCenterDate = calendarElement.minDate;
+                let maxCenterDate = calendarElement.maxDate;
+
+                //calculates min max
+                let departureLowerDate = minCenterDate;
+                let departureUpperDate = maxCenterDate;
+                if(this.period.value == 'month'){
+                    departureLowerDate = minCenterDate.minus({ days: (Math.ceil(this.clusterNumber.month/2)+1)*30 });
+                    departureUpperDate = maxCenterDate.plus({ days: (Math.ceil(this.clusterNumber.month/2)-1)*30 });
+                    departureUpperDate = departureUpperDate.plus({ day: 1 });
+                }else if(this.period.value == 'week'){
+                    departureLowerDate = minCenterDate.minus({ days: (Math.ceil(this.clusterNumber.week/2)+1)*7 });
+                    departureUpperDate = maxCenterDate.plus({ days: (Math.ceil(this.clusterNumber.week/2)-1)*7 });
+                    departureUpperDate = departureUpperDate.plus({ day: 1 });
+                }else{
+                    departureLowerDate = minCenterDate.minus({ days: Math.ceil(this.clusterNumber.day/2)+1 });
+                    departureUpperDate = maxCenterDate.plus({ days: Math.ceil(this.clusterNumber.day/2) });
+                }
+                where = this.addWhereCondition(where,"smetadata.departure_timestamp.gt."+departureLowerDate.toMillis()/1000);
+                where = this.addWhereCondition(where,"smetadata.departure_timestamp.lt."+departureUpperDate.toMillis()/1000);
             }else{
                 let now = new Date();
                 where = this.addWhereCondition(where,"smetadata.departure_timestamp.gt."+now.getTime()/1000); //TDO: decide how to handle it.
@@ -560,10 +642,10 @@ export default {
         }
     },
     sortByTimestamp: function (a, b) {
-        if (a.timestamp < b.timestamp) {
+        if (a.departure.timestamp < b.departure.timestamp) {
             return -1
         }
-        if (a.timestamp > b.timestamp) {
+        if (a.departure.timestamp > b.departure.timestamp) {
             return 1
         }
         return 0
@@ -630,7 +712,7 @@ export default {
             }
         }
 
-        // TODO: realtime data endpoints
+        // TODO: realtime data not yet available
         // ontime
         // delayed
         // cancelled
@@ -668,6 +750,12 @@ export default {
 
   //computed calculations
   computed: {
+    isMobile(){
+        return (this.device == 'smartphone' || this.device == 'tablet');
+    },
+    getShownSearchText(){
+        return (this.airportSelectFieldValue) ? this.airportSelectFieldValue : this.$t("allAirports")
+    },
     getTimeInterval(){
         if(this.selectedTimeIntervalIndex){
             return this.selectedTimeIntervalIndex;
@@ -749,9 +837,6 @@ export default {
                 value:period.value
             }
         })
-    },
-    lastFlights() {
-        return this.flights
     },
     sortedAirports() {
         let sortedAirports = []
@@ -839,7 +924,7 @@ export default {
     this.handleViewportResize();
   },
 
-  //component whatcers
+  //component watchers
   watch: {
   },
 
@@ -856,9 +941,9 @@ export default {
   data() {
       return {
         clusterNumber:{
-            'day':20,
-            'week':12,
-            'month':6
+            'day':31,
+            'week':13,
+            'month':7
         },
         period:{label:'Day',value:'day'},
         selectedTimeIntervalIndex:0,
@@ -888,6 +973,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 @import "~bootstrap/scss/bootstrap.scss";
 @import "~vuelayers/dist/vuelayers.min.css";
 @import "../css/hooper.css";
@@ -895,8 +981,61 @@ export default {
 
 .noi-flightdata-realitime {
 
+
+    .row{
+        .noi-col-1{
+            flex: 0 0 auto;
+            width: 8.33%;
+        }
+        .noi-col-2{
+            flex: 0 0 auto;
+            width: 16.66%;
+        }
+        .noi-col-3{
+            flex: 0 0 auto;
+            width: 25%;
+        }
+        .noi-col-4{
+            flex: 0 0 auto;
+            width: 33.33%;
+        }
+        .noi-col-5{
+            flex: 0 0 auto;
+            width: 41.66%;
+        }
+        .noi-col-6{
+            flex: 0 0 auto;
+            width: 50%;
+        }
+        .noi-col-7{
+            flex: 0 0 auto;
+            width: 58.33%;
+        }
+        .noi-col-8{
+            flex: 0 0 auto;
+            width: 66.66%;
+        }
+        .noi-col-9{
+            flex: 0 0 auto;
+            width: 79%;
+        }
+        .noi-col-10{
+            flex: 0 0 auto;
+            width: 83.33%;
+        }
+        .noi-col-11{
+            flex: 0 0 auto;
+            width: 91.66%;
+        }
+        .noi-col-12{
+            flex: 0 0 auto;
+            width: 100%;
+        }
+    }
+
     // skyapls theme
     &.skyalps {
+        --noi-font-family: 'Barlow Semi Condensed';
         --noi-primary: #a1bad4;
         --noi-mid: #a1bad4;
         --noi-secondary: #004988;
@@ -919,6 +1058,11 @@ export default {
                 }
             }
         }
+       
+
+        .noi-change-search{
+            color:#004988;
+        }
 
         &.smartphone, &.tablet{
             .noi-top-navigator-container div{
@@ -936,8 +1080,7 @@ export default {
         }
     }
 
-
-    font-family: var(--noi-font-family, Verdana);
+    font-family: var(--noi-font-family, 'Barlow Semi Condensed','Source Sans Pro', Verdana);
     font-size: var(--basic-font-size, 16px);
     color:var(--noi-text-primary,black);
     background-color: white;
@@ -994,14 +1137,6 @@ export default {
         display: none;
     }
 
-    .load-more {
-        cursor: pointer;
-
-        td {
-            color: black !important;
-            background-color: var(--noi-jam-strong, #e4c200) !important;
-        }
-    }
 
     .sm-only {
         display: none;
@@ -1017,9 +1152,135 @@ export default {
         top: 1.15rem;
     }
 
+    /* SMALL DESKTOP */
+    &.small-desktop{
+        .noi-content-container{
+            .noi-results-container{
+                .noi-flights-results-list{
+                    .noi-flights-results-row{
+                        margin:0;
+                    }
+
+                    .noi-flight-row-button{
+                        .button{
+                            padding:1rem 1rem;
+                        }
+                    }
+                }
+            }
+        }
+
+        .row{
+            .noi-col-sd-1{
+                flex: 0 0 auto;
+                width: 8.33%;
+            }
+            .noi-col-sd-2{
+                flex: 0 0 auto;
+                width: 16.66%;
+            }
+            .noi-col-sd-3{
+                flex: 0 0 auto;
+                width: 25%;
+            }
+            .noi-col-sd-4{
+                flex: 0 0 auto;
+                width: 33.33%;
+            }
+            .noi-col-sd-5{
+                flex: 0 0 auto;
+                width: 41.66%;
+            }
+            .noi-col-sd-6{
+                flex: 0 0 auto;
+                width: 50%;
+            }
+            .noi-col-sd-7{
+                flex: 0 0 auto;
+                width: 58.33%;
+            }
+            .noi-col-sd-8{
+                flex: 0 0 auto;
+                width: 66.66%;
+            }
+            .noi-col-sd-9{
+                flex: 0 0 auto;
+                width: 79%;
+            }
+            .noi-col-sd-10{
+                flex: 0 0 auto;
+                width: 83.33%;
+            }
+            .noi-col-sd-11{
+                flex: 0 0 auto;
+                width: 91.66%;
+            }
+            .noi-col-sd-12{
+                flex: 0 0 auto;
+                width: 100%;
+            }
+        }
+    }
 
     /* MOBILE */
     &.smartphone, &.tablet {
+        .noi-change-search{
+            display: inline-block !important;
+            
+            padding: 1rem 1rem 0 1rem;
+        }
+
+        .row{
+            .noi-col-mob-1{
+                flex: 0 0 auto;
+                width: 8.33%;
+            }
+            .noi-col-mob-2{
+                flex: 0 0 auto;
+                width: 16.66%;
+            }
+            .noi-col-mob-3{
+                flex: 0 0 auto;
+                width: 25%;
+            }
+            .noi-col-mob-4{
+                flex: 0 0 auto;
+                width: 33.33%;
+            }
+            .noi-col-mob-5{
+                flex: 0 0 auto;
+                width: 41.66%;
+            }
+            .noi-col-mob-6{
+                flex: 0 0 auto;
+                width: 50%;
+            }
+            .noi-col-mob-7{
+                flex: 0 0 auto;
+                width: 58.33%;
+            }
+            .noi-col-mob-8{
+                flex: 0 0 auto;
+                width: 66.66%;
+            }
+            .noi-col-mob-9{
+                flex: 0 0 auto;
+                width: 79%;
+            }
+            .noi-col-mob-10{
+                flex: 0 0 auto;
+                width: 83.33%;
+            }
+            .noi-col-mob-11{
+                flex: 0 0 auto;
+                width: 91.66%;
+            }
+            .noi-col-mob-12{
+                flex: 0 0 auto;
+                width: 100%;
+            }
+        }
+
         .sm-only {
             display: block;
         }
@@ -1056,7 +1317,15 @@ export default {
                         height: 4rem;
                         width: min-content;
                         padding: 0.53rem 0;
+                        text-transform: uppercase;
+
+                        border-right:1px solid #f5f5f5;
+                        border-left:1px solid #f5f5f5;
                         
+                        &.selected{
+                            border-right-color: black;
+                            border-left-color: black;
+                        }
                         &.day{
                             padding: 0.53rem 1rem;
                         }
@@ -1124,7 +1393,110 @@ export default {
                     }
                 }
 
+                .noi-loader-results-container{
+                    // placeholder
+                    .placeholder-content {
+                        height: 29rem;
+                        &_item {                   
+                            &:nth-child(1) {
+                                top: 0rem;
+                                left: 0;
+                                width: 100%;
+                                height: 1rem;
+                            }
+                            &:nth-child(2) {
+                                top: 1rem;
+                                left: 0;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(3) {
+                                top: 1rem;
+                                left: 95%;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(4) {
+                                top: 7rem;
+                                left: 0;
+                                width: 100%;
+                                height: 1rem;
+                            }
+
+                            // row 1
+                            &:nth-child(5) {
+                                top: 8rem;
+                                left: 0;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(6) {
+                                top: 8rem;
+                                left: 95%;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(7) {
+                                top: 14rem;
+                                left: 0;
+                                width: 100%;
+                                height: 1rem;
+                            }
+
+                            // row 2
+                            &:nth-child(8) {
+                                top: 15rem;
+                                left: 0;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(9) {
+                                top: 15rem;
+                                left: 95%;
+                                width: 5%;
+                                height: 6rem;
+                            }                            
+                            &:nth-child(10) {
+                                top: 21rem;
+                                left: 0;
+                                width: 100%;
+                                height: 1rem;
+                            }
+
+                            // row 3
+                            &:nth-child(11) {
+                                top: 22rem;
+                                left: 0;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(12) {
+                                top: 22rem;
+                                left: 95%;
+                                width: 5%;
+                                height: 6rem;
+                            }
+                            &:nth-child(13) {
+                                top: 28rem;
+                                left: 0;
+                                width: 100%;
+                                height: 1rem;
+                            }
+                            
+                        }
+                    }
+
+                    @keyframes placeholderAnimate {
+                        0%{ background-position: -650px 0; }
+                        100%{ background-position: 650px 0; }
+                    }
+
+                    
+                }
+
+
             }
+            
             
             .hooper {
                 height: 4rem;
@@ -1140,6 +1512,7 @@ export default {
         text-align: center;
 
         img{
+            padding: 0.25rem;
             margin: 0.25rem;
             width: auto;
             height: 3rem;
@@ -1150,7 +1523,7 @@ export default {
         padding: 1rem 1rem 0 1rem;
     }
     .noi-details-back{
-        margin:3rem 0 1rem 0;
+        margin:2rem 0 1rem 0;
         text-align: left;
         font-size: 1rem;
         font-weight: 500;
@@ -1165,6 +1538,31 @@ export default {
         margin: 0 auto;
     }
 
+    .noi-change-search,.noi-details-back{
+
+        .search-details{
+            display: inline;
+            float:left;
+            padding-top: 0.5rem;
+
+            svg{
+                font-size: 1.3rem;
+                margin-top: -5px;
+            }
+        }
+        .update-button,.update-icon{
+            display: inline;
+            float: right;
+            font-size: 1.3rem;
+            .button{
+                max-width: fit-content;
+                padding:0.5rem 1rem;
+            }
+        }
+        .update-icon{
+            font-size: 1.5rem;
+        }
+    }
     .noi-change-search{
         text-align: center;
         width: 100%;
@@ -1178,18 +1576,17 @@ export default {
                 transform: rotate(180deg);
             }
         }
+
     }
     .noi-search-fields-container {    
         color: var(--noi-text-primary, black);
         width: 100%;
         background-color: var(--noi-primary-contrast, #ffffff);
-        padding:1rem 1.5rem 0 1.5rem;
+        padding:0 1.5rem 0 1rem;
         margin-bottom: 2rem;
 
         
         &.close{
-            // transition:opacity 0.3s ease-out, height 0.8s ease-out, display 0.8s ease-out;
-            // opacity: 0;
             display: none;
         }
 
@@ -1234,6 +1631,8 @@ export default {
                 padding: 0.53rem 0;
                 cursor: pointer;
                 height: 3rem;
+                text-transform: uppercase;
+
     
                 &:hover, &.selected{
                     color:var(--noi-text-secondary,white);
@@ -1280,7 +1679,8 @@ export default {
             }
             .noi-flight-row-logo{
                 img{
-                    max-width: 110px;
+                    max-width: 8.125rem;
+                    margin:0.6rem 0;
                 }
                 span{
                     font-weight: bold;
@@ -1405,6 +1805,7 @@ export default {
             }
             .noi-flight-row-status{
                 font-weight: bold;
+                padding-top: 0.75rem;
 
                 .status{
                     font-size: 1.2rem;
@@ -1423,9 +1824,167 @@ export default {
         }
     }
 
+
+    .noi-flights-any-result{
+        margin-top: 2rem;
+        text-align: center;
+        color:var(--noi-text-primary,black);
+    }
+
     .noi-loader-results-container{
         color: rgba(0, 0, 0, 0.5);
-        margin:50px 0;
+        // margin:50px 0;
+        margin:0 0 3rem 0;
+
+
+        // placeholder
+        .placeholder-content {
+            height: 13rem;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+            
+            // Animation
+            animation-duration: 1.7s;
+            animation-fill-mode: forwards;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            animation-name: placeholderAnimate;
+            background: #f6f7f8; // Fallback
+            background: linear-gradient(to right, #eee 2%, #ddd 18%, #eee 33%);
+            background-size: 1200px; // Animation Area
+            
+            &_item {
+                width: 100%;
+                height: 2rem;
+                position: absolute;
+                background: #fff;
+                z-index: 2;
+                
+                &:after,
+                &:before {
+                    width: inherit;
+                    height: inherit;
+                    content: '';
+                    position: absolute;
+                }
+                
+                // row 1
+                &:nth-child(1) {
+                    top: 0rem;
+                    left: 5%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(2) {
+                    top: 0rem;
+                    left: 20%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(3) {
+                    top: 0rem;
+                    left: 35%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(4) {
+                    top: 0rem;
+                    left: 70%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(5) {
+                    top: 0rem;
+                    left: 85%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                
+                // row 2                 
+                &:nth-child(6) {
+                    top: 3rem;
+                    left: 0;
+                    height: 2rem;
+                }
+                &:nth-child(7) {
+                    top: 5rem;
+                    left: 5%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(8) {
+                    top: 5rem;
+                    left: 20%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(9) {
+                    top: 5rem;
+                    left: 35%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(10) {
+                    top: 5rem;
+                    left: 70%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(11) {
+                    top: 5rem;
+                    left: 85%;
+                    width: 5%;
+                    height: 3rem;
+                }
+
+
+                // row 3            
+                &:nth-child(12) {
+                    top: 8rem;
+                    left: 0;
+                    height: 2rem;
+                }
+                &:nth-child(13) {
+                    top: 10rem;
+                    left: 5%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(14) {
+                    top: 10rem;
+                    left: 20%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(15) {
+                    top: 10rem;
+                    left: 35%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(16) {
+                    top: 10rem;
+                    left: 70%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                &:nth-child(17) {
+                    top: 10rem;
+                    left: 85%;
+                    width: 5%;
+                    height: 3rem;
+                }
+                
+            }
+        }
+
+        @keyframes placeholderAnimate {
+            0%{ background-position: -650px 0; }
+            100%{ background-position: 650px 0; }
+        }
+
+        
     }
 
     //buttons

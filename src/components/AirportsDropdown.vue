@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <div class="airport-dropdown-element" @click="selectAirport(null)">
                 <div class="row ">
                     <span class="col text-start">{{ $parent.$t("allAirports") }}</span> 
-                    <span class="col text-end"></span>
+                    <span class="col-2 text-end"></span>
                 </div>
             </div>
             
@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <div class="airport-dropdown-element" v-for="(airport, index) in cluster.airports" @click="selectAirport(airport)">
                     <div class="row ">
                         <span class="col text-start">{{ airport.label }}</span> 
-                        <span class="col text-end">{{ airport.value }}</span>
+                        <span class="col-2 text-end">{{ airport.value }}</span>
                     </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 if(that.searchText == null){
                     return filteredClusters;
                 }
-
+                
                 return filteredClusters.filter(function(cluster) {
                     cluster.airports = cluster.airports.filter(function(airport){
                         return (
@@ -86,7 +86,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         )
                     });
                     
-                    if(cluster.airports.length > 0){
+                    if( cluster.airports.length > 0 || 
+                        cluster.value.toUpperCase().includes(that.searchText.toUpperCase()) ||
+                        cluster.label.toUpperCase().includes(that.searchText.toUpperCase())){
                         return true;
                     }else{
                         return false;
@@ -124,7 +126,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             },
             selectAirport(el) {
                 if (el == null){
-                    el = {label:this.$parent.$t("AllAirports"),value:null};
+                    el = {label:this.$parent.$t("allAirports"),value:null};
                 }
 
                 let selectedValue = el.value

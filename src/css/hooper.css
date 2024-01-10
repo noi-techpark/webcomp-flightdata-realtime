@@ -1,9 +1,8 @@
-/* 
+/*
 SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 */
-
 .hooper-slide {
   flex-shrink: 0;
   height: 100%;
@@ -80,10 +79,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   cursor: not-allowed;
 }
 .hooper-next {
-    right: calc(-50%/(4*2));
+    right: calc(-50%/(4));
 }
 .hooper-prev {
-    left: calc(-50%/(4*2));
+    left: calc(-50%/(4));
 }
 .hooper-navigation.is-vertical .hooper-next {
   top: auto;
