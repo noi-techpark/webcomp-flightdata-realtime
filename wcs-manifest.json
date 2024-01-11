@@ -92,10 +92,10 @@
           "label": "Color presets",
           "options": {
             "values": [
-              "odh",
+              "OpenDataHub",
               "skyalps"
             ],
-            "default": "odh"
+            "default": "OpenDataHub"
           }
         },
         {
