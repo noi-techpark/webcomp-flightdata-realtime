@@ -981,6 +981,10 @@ export default {
 
 .noi-flightdata-realitime {
 
+    
+    .form-floating > .form-control:focus, .form-floating > .form-control:not(:placeholder-shown), .form-floating > .form-control-plaintext:focus, .form-floating > .form-control-plaintext:not(:placeholder-shown){
+        font-weight: 600;
+    }
 
     .row{
         .noi-col-1{
@@ -1041,19 +1045,41 @@ export default {
         --noi-secondary: #004988;
         --noi-text-primary: black;
         --noi-text-secondary: white;
+
+        h2{
+            font-weight: 600;
+        }
+
         .noi-top-navigator-container {
             color:white;
             .noi-horizontal-calendar-container{
+                .noi-horizontal-calendar-element{
+                    font-weight: 600;
+                }
                 .hooper-navigation{
                     fill:white;
                 }
             } 
+
         }
         .noi-details-container {
             .noi-details-description-container{
                 .noi-details-description-container-top{
                     .noi-details-from-to-title{
                         color:#004988;
+                        font-weight: 600;
+                    }
+
+                    .noi-details-flight-row-path{
+                        .noi-details-flight-times{
+                            font-weight: 600;    
+                        }
+                    }
+                }
+
+                .noi-details-description-container-gray{
+                    .noi-details-from-to{
+                        font-weight: 600;
                     }
                 }
             }
@@ -1064,7 +1090,33 @@ export default {
             color:#004988;
         }
 
+        .noi-results-container{                
+            .noi-flights-results-list{
+                .noi-flights-results-row{
+                    .noi-flight-row-airport{
+                        span{
+                            font-weight: 600;
+                        }
+                    }
+                    .noi-flight-row-flight-number{
+                        font-weight: 600;
+                    }
+                    .noi-flight-row-status{
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
         &.smartphone, &.tablet{
+            .noi-content-container{
+                .noi-top-navigator-container{
+                    .noi-horizontal-calendar-container{
+                        .noi-horizontal-calendar-element{
+                            font-weight: 600;
+                        }
+                    }
+                }
+            }
             .noi-top-navigator-container div{
                 color:white;
             }
@@ -1080,7 +1132,7 @@ export default {
         }
     }
 
-    font-family: var(--noi-font-family, 'Barlow Semi Condensed','Source Sans Pro', Verdana);
+    font-family: var(--noi-font-family,'Source Sans Pro', 'Barlow Semi Condensed', Verdana);
     font-size: var(--basic-font-size, 16px);
     color:var(--noi-text-primary,black);
     background-color: white;
@@ -1101,7 +1153,7 @@ export default {
     h2 {
         font-size: var(--h2-font-size, 2rem);
 
-        font-weight: bold;
+        font-weight: 500;
         line-height: 2.5rem;
         margin-bottom: 0.125rem;
         padding-top: 0.25rem;
@@ -1314,6 +1366,8 @@ export default {
                     width:100%;
 
                     .noi-horizontal-calendar-element{
+                        font-weight: 500;
+                        line-height: 1.6rem;
                         height: 4rem;
                         width: min-content;
                         padding: 0.53rem 0;
@@ -1626,8 +1680,9 @@ export default {
 
             .noi-horizontal-calendar-element{
                 text-align: center;
+                line-height: 1.4em;
                 font-size: 1.5rem;
-                font-weight: bold;
+                font-weight: 500;
                 padding: 0.53rem 0;
                 cursor: pointer;
                 height: 3rem;
@@ -1644,7 +1699,7 @@ export default {
                     padding-left: 0.2rem;
                 }
             }
-    }
+        }
     }
 
     .noi-flights-results-list{
@@ -1690,7 +1745,7 @@ export default {
             .noi-flight-row-airport{
 
                 span{
-                    font-weight: bold;
+                    font-weight: 500;
                     &.date{
                         color:#6e6e6d;
                         font-weight:normal;
@@ -1800,11 +1855,11 @@ export default {
                 }
             }
             .noi-flight-row-flight-number{
-                font-weight: bold;
+                font-weight: 500;
                 padding-top: 0.75rem;
             }
             .noi-flight-row-status{
-                font-weight: bold;
+                font-weight: 500;
                 padding-top: 0.75rem;
 
                 .status{

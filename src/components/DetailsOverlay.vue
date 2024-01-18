@@ -386,6 +386,26 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     color:#ffffff;
                 }
             }
+            .noi-details-description-container{
+                // white area
+                .noi-details-description-container-top{
+                    .noi-details-date{
+                        font-weight: 600;
+                    }
+                    .noi-details-date{
+                        font-weight: 400;
+                    }
+                }
+                // gray area
+                .noi-details-description-container-gray{
+                    .noi-details-status{
+                        font-weight: 600;
+                    }
+                    .noi-details-from-to{
+                        font-weight: 600;
+                    }
+                }
+            }
         }
 
         // mobile
@@ -427,6 +447,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     }
                     .noi-details-from-to-title{
                         font-size: 1.15rem;
+                        font-weight: 500;
                     }
                     .noi-details-date{
                         font-size: 1rem;
@@ -453,7 +474,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             }
                         }
                         .noi-details-flight-times{
-                            font-weight: bold;    
+                            font-weight: 500;    
                             margin: 1.8rem -0.5rem 0 -0.9rem;
                         }
                     }
@@ -467,7 +488,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     .noi-details-from-to{
                         background-color: #ffffff;
                         font-size: 1rem;
-                        font-weight: bold;
+                        font-weight: 500;
                         padding: 1rem;
                         border-top: 1px solid #e5e5e5;
 
@@ -496,10 +517,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 .noi-details-date{
                     text-align: center;                
                     font-size: 1.125rem;
-                    font-weight: bold;
+                    font-weight: 500;
                     padding-bottom: 2.1rem;
                 }
                 .noi-details-flight-number{
+                    font-weight: 500;
                     text-align:center;         
                     font-size: 1rem;
 
@@ -631,7 +653,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                 .noi-details-status{
                     font-size: 1.5rem;
-                    font-weight: bold;
+                    font-weight: 500;
                     padding: 2rem 0;
 
                     &.green{
@@ -656,7 +678,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 }
                 .noi-details-from-to{
                     font-size: 1rem;
-                    font-weight: bold;
+                    font-weight: 500;
                     padding: 2rem;
                     border-top: 1px solid #e5e5e5;
                 }
