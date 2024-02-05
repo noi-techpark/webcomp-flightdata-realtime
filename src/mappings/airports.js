@@ -14,17 +14,17 @@ module.exports = {
     nation: "DE"
   },
   BZO: {
-    pos: [11.3264, 46.460201],
+    pos: [11.3272849, 46.4624885],
     name: "Bolzano",
     nation: "IT"
   },
   MXP: {
-    pos: [0,0],
+    pos: [8.716707,45.6287848],
     name: "Milano Malpensa",
     nation: "IT"
   },
   HAJ: {
-    pos: [0,0],
+    pos: [9.6816627,52.4627115],
     name: "Hannover",
     nation: "DE"
   },
@@ -44,7 +44,7 @@ module.exports = {
     nation: "DE"
   },
   DUS: {
-    pos: [6.76678, 51.289501],
+    pos: [6.7641859, 51.2876552],
     name: "Düsseldorf",
     nation: "DE"
   },
@@ -74,7 +74,7 @@ module.exports = {
     nation: "IT"
   },
   CRV: {
-    pos: [0,0],
+    pos: [17.0747604,38.9947204],
     name: "Crotone",
     nation: "IT"
   },
@@ -119,42 +119,42 @@ module.exports = {
     nation: "BEL"
   },
   KSF: {
-    pos: [0, 0],
+    pos: [9.3836103,51.4164133],
     name: "Kassel",
     nation: "DE"
   },
   DBV: {
-    pos: [0, 0],
+    pos: [18.2596123, 42.5603174],
     name: "Dubrovnik",
     nation: "HRV"
   },
   FCO: {
-    pos: [0, 0],
+    pos: [12.2512448, 41.7960417],
     name: "Roma Fiumicino",
     nation: "IT"
   },
   VRN: {
-    pos: [0, 0],
+    pos: [10.8828126, 45.3971535],
     name: "Verona",
     nation: "IT"
   },
   LNZ: {
-    pos: [0, 0],
+    pos: [14.1892143, 48.2394698],
     name: "Linz",
     nation: "AU"
   },
   CUF: {
-    pos: [0, 0],
+    pos: [7.6160239, 44.5475807],
     name: "Cuneo",
     nation: "IT"
   },
   STN: {
-    pos: [0, 0],
+    pos: [0.2387409, 51.8863747],
     name: "Londra-Stansted",
     nation: "GBR"
   },
   BRN: {
-    pos: [0, 0],
+    pos: [7.4965921, 46.912222],
     name: "Berna",
     nation: "CH"
   },

@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <div class="row noi-description-bar" v-if="options.showTopDescription && !showResults && !details.show" :class="{'pt-2': showResults}">
             <div class="col">
                 <h2>{{ $t("header.title") }}</h2>
-                <p>{{ $t("header.description") }} <strong>{{ localAirport.name }} ({{ localAirport.key }})</strong></p>
+                <p>{{ $t("header.description") }} <strong>{{ airports[localAirportKey].name }} ({{ localAirportKey }})</strong></p>
             </div>
         </div>
     </div>
@@ -600,7 +600,7 @@ export default {
                     }
                 }
             }
-            where = this.addWhereCondition(where,"or(smetadata.fromdestination.eq."+this.localAirport.key+",smetadata.todestination.eq."+this.localAirport.key+")");
+            where = this.addWhereCondition(where,"or(smetadata.fromdestination.eq."+this.localAirportKey+",smetadata.todestination.eq."+this.localAirportKey+")");
 
             // handle dates
             let calendarElement = this.calendarElements[this.selectedTimeIntervalIndex];
@@ -887,13 +887,11 @@ export default {
   //on mount component
   mounted: function () {
     //init local airport
-    let key = this.options.localAirport;
-    if(!this.airports[key]){
-        key = 'BZO';
+    this.localAirportKey = this.options.localAirport
+    if(!this.airports[this.localAirportKey]){
+        this.localAirportKey = 'BZO';
     }
-    this.localAirport = this.airports[key];
-    this.localAirport.key = key
-
+    console.log("this.localAirportKey",this.localAirportKey)
 
     //init periods
     this.selectedTimeIntervalIndex = this.getDefaultTimeInterval;
@@ -948,7 +946,7 @@ export default {
         period:{label:'Day',value:'day'},
         selectedTimeIntervalIndex:0,
 
-        localAirport:{name:"Bozen",key:'BZO'},
+        localAirportKey:'BZO',
         airport:ref(),
         airportSelectFieldValue:'',
         details:{

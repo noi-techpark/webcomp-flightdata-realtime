@@ -57,7 +57,7 @@
           }
         },
         {
-          "key": "localAirport",
+          "key": "localairport",
           "type": "textarea",
           "label": "The IATA code of the local airport.",
           "required": false,
