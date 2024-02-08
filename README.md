@@ -32,7 +32,7 @@ Include vue.js (https://unpkg.com/vue) and the webcompscript file `dist/noi-flig
     styleUrl="./demo-assets/custom.css"
     id="atc-main"
     language="en"
-    localAirport="BZO"
+    localairport="BZO"
     timezone="Europe/Berlin">
 </noi-flightdata-realitime>
 ```
@@ -50,9 +50,9 @@ Options: "en", "it", "de"
 Translations can be changed or added via the langPack attribute: [the demo](demo.html)
 
 
-#### localAirport
+#### localairport
 
-The attribute localAirport can be passed as a airport IATA code which defines the local airports from where flights depart or arrive.
+The attribute localairport can be passed as a airport IATA code which defines the local airports from where flights depart or arrive.
 
 Type: string<br>
 Examples: "BZO", "BER", "VRN"

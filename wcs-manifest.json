@@ -1,5 +1,5 @@
 {
-    "title": "Webcomponent: Flightdata realtime",
+    "title": "Flightdata realtime",
     "shortName": "flightdata-realtime",
     "description": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
     "descriptionAbstract": "A webcomponent that manage the realtime flightdata & Skyalps realtime flights",
@@ -57,7 +57,7 @@
           }
         },
         {
-          "key": "localAirport",
+          "key": "localairport",
           "type": "textarea",
           "label": "The IATA code of the local airport.",
           "required": false,

@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     langPack: JSON.parse(langPack),
     theme: theme,
     timezone: timezone,
-    localAirport: localAirport,
+    localAirport: localairport,
     restEndpoint: restEndpoint,
   }" />
 </template>
@@ -50,7 +50,7 @@ export default {
       type: String,
       default: "{}"
     },
-    localAirport: {
+    localairport: {
       type: String,
       default: "BZO"
     },

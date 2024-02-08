@@ -252,7 +252,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             }
         },
         mounted: function () {
-            this.flight.angle = this.getFlightAngle(this.flight)*1 + 90
+            // this.flight.angle = this.bearing(this.flight)
+            // this.flight.angle = this.angleFromCoordinate(this.flight)
+            this.flight.angle = this.getFlightAngle(this.flight)*1
             this.map.center = this.getCenterCoordinates(this.flight);
             this.fitZoom(this.flight);
         },
@@ -261,8 +263,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             getFlightAngle(flight){
                 let dx = (flight.arrival.airport.coordinates[0]*1.0-flight.departure.airport.coordinates[0]*1.0);
                 let dy = (flight.arrival.airport.coordinates[1]*1.0-flight.departure.airport.coordinates[1]*1.0);
-                let angle = (Math.atan2(dx,dy)*180.0)/Math.PI;
-                return angle;
+                let angle = (Math.atan2(dy,dx)*180.0)/Math.PI;
+                return -angle+5;
             },
             reduceCoordinates(coordinates,which,offset){
                 let offsetY = offset*((coordinates[0][1]-coordinates[1][1]));
