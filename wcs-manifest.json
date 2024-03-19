@@ -24,8 +24,7 @@
     "image": "wcs-logo.png",
     "searchTags": [
       "realtime",
-      "flights",
-      "skyalps"
+      "flights"
     ],
     "dist": {
       "basePath": "dist",
