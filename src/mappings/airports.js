@@ -158,5 +158,51 @@ module.exports = {
     name: "Berna",
     nation: "CH"
   },
+  AOI: {
+    pos: [13.357331904, 43.609664228],
+    name: "Ancona",
+    nation: "IT"
+  },
+  BRI: {
+    pos: [16.7563536412, 41.1366461201],
+    name: "Bari",
+    nation: "IT"
+  },
+  CFU: {
+    pos: [16.7563536412, 41.1366461201],
+    name: "Corfu",
+    nation: "GR"
+  },
+  LIN: {
+    pos: [9.273665572, 45.442998228],
+    name: "Milano Linate",
+    nation: "IT"
+  },
+  OMO: {
+    pos: [17.84082997, 43.276332228],
+    name: "Mostar",
+    nation: "BA"
+  },
+  MUC: {
+    pos: [11.775027899999941, 48.3536621],
+    name: "Munich",
+    nation: "DE"
+  },
+  NAP: {
+    pos: [14.287832182, 40.883996464],
+    name: "Napoli",
+    nation: "IT"
+  },
+  STR: {
+    pos: [9.219832454, 48.687330584],
+    name: "Stuttgart",
+    nation: "DE"
+  },
+  ZAD: {
+    pos: [15.341331968, 44.10499958],
+    name: "Zara",
+    nation: "HRV"
+  },
+
 
 };

@@ -5,15 +5,15 @@
 module.exports = [
     {
         name:"Italy",
-        airports:["BZO","CAG","FCO","VRN","OLB","SUF","CRV","CTA","BDS","BGY","CUF"]
+        airports:["BZO","CAG","FCO","VRN","OLB","SUF","CRV","CTA","BDS","BGY","CUF","AOI","BRI","LIN","NAP"]
     },
     {
         name:"Deutschland",
-        airports:["BWK","DUS","HAM","KSF","BER"]
+        airports:["BWK","DUS","HAM","KSF","BER","MUC","STR"]
     },
     {
         name:"Hrvatska",
-        airports:["BWK","DBV"]
+        airports:["BWK","DBV","ZAD"]
     },
     {
         name:"Espana",
@@ -42,5 +42,13 @@ module.exports = [
     {
         name:"Österreich",
         airports:["LNZ"]
+    },
+    {
+        name:"Greece",
+        airports:["CFU"]
+    },
+    {
+        name:"Bosnia ed Erzegovina",
+        airports:["OMO"]
     }
 ];
