@@ -1009,9 +1009,12 @@ export default {
         return this.airports[key];
       }
       console.log(
-        "Error: any airport named '" + key + "' has been found in mapping."
+        "Error: no airport with code '" + key + "' has been found in mapping."
       );
-      return this.airports[this.localAirportKey];
+
+      let defaultAirport = {...this.airports[this.localAirportKey]};
+      defaultAirport.name = key;
+      return defaultAirport;
     },
   },
   //computed calculations
