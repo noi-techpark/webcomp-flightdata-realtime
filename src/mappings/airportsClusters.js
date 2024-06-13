@@ -50,5 +50,9 @@ module.exports = [
     {
         name:"Bosnia ed Erzegovina",
         airports:["OMO"]
+    },
+    {
+        name:"Luxembourg",
+        airports:["LUX"]
     }
 ];

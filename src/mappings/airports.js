@@ -203,6 +203,11 @@ module.exports = {
     name: "Zara",
     nation: "HRV"
   },
+  LUX: {
+    pos: [6.214745, 49.628899],
+    name: "Luxembourg",
+    nation: "LU"
+  },
 
 
 };
