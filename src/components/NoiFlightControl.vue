@@ -1008,10 +1008,10 @@ export default {
       if (key in this.airports) {
         return this.airports[key];
       }
-      error.log(
+      console.log(
         "Error: any airport named '" + key + "' has been found in mapping."
       );
-      return this.airports[localAirportKey];
+      return this.airports[this.localAirportKey];
     },
   },
   //computed calculations
