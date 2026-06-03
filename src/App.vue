@@ -6,13 +6,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <template>
   <NoiFlightControl :options="{
-    language: language,
-    showTopDescription: showTopDescription,
-    langPack: JSON.parse(langPack),
-    theme: theme,
-    timezone: timezone,
-    localAirport: localairport,
-    restEndpoint: restEndpoint,
+  language: language,
+  showTopDescription: showTopDescription,
+  langPack: JSON.parse(langPack),
+  theme: theme,
+  timezone: timezone,
+  localAirport: localairport,
+  restEndpoint: restEndpoint,
+  tripEndpoint: tripEndpoint,
   }" />
 </template>
 
@@ -66,7 +67,7 @@ export default {
     },
     restEndpoint: {
       type: String,
-      default: "https://mobility.api.opendatahub.com/v2/flat%2Cnode/Flight?"
+      default: "https://tourism.api.opendatahub.com/v1/Trip?"
     }
   },
   components: {

@@ -641,110 +641,96 @@ export default {
       return (where += condition);
     },
     parseData: function (data) {
-      let parsedData = {};
-      // let parsedData = data.data.data.map((o) => {
+  let parsedData = {};
+  let items = data?.data?.Items || [];
 
-      for (let i = 0; i < data.data.data.length; i++) {
-        let o = data.data.data[i];
+  for (let i = 0; i < items.length; i++) {
+    let o = items[i];
 
-        let datetimeDeparture = DateTime.fromFormat(
-          o.smetadata.fltsfromperiod + " " + o.smetadata.std,
-          "yyyy-LL-dd T",
-          { zone: "UTC" }
-        );
-        let datetimeArrival = DateTime.fromFormat(
-          o.smetadata.fltstoperiod + " " + o.smetadata.sta,
-          "yyyy-LL-dd T",
-          { zone: "UTC" }
-        );
+    if (!o.StopTimes || o.StopTimes.length < 2) continue;
 
-        let rate = o.smetadata.fares ? o.smetadata.fares["SKY_LIGHT"] : null;
+    const departureStop = o.StopTimes[0];
+    const arrivalStop = o.StopTimes[o.StopTimes.length - 1];
 
-        if (rate) {
-          rate =
-            rate.fare.adultFareOW +
-            rate.fare.tax1OW +
-            rate.fare.tax2OW +
-            rate.fare.tax3OW +
-            rate.fare.tax4OW;
-        }
+    const departureCode = departureStop.Shortname || "";
+    const arrivalCode = arrivalStop.Shortname || "";
 
-        if (isNaN(rate) || rate == 0) rate = false;
+    const departureRaw = departureStop.DepartureTime || "";
+    const arrivalRaw = arrivalStop.ArrivalTime || "";
 
-        //check for airports map
-        if (!this.airports[o.smetadata.fromdestination]) {
-          console.log(
-            "Error: any departure airport named '" +
-              o.smetadata.fromdestination +
-              "' has been found in mapping."
-          );
-        }
-        if (!this.airports[o.smetadata.todestination]) {
-          console.log(
-            "Error: any arrival airport named '" +
-              o.smetadata.todestination +
-              "' has been found in mapping."
-          );
-        }
+    const departureDT = DateTime.fromISO(departureRaw);
+    const arrivalDT = DateTime.fromISO(arrivalRaw);
 
-        let obj = {
-          departure: {
-            date: o.smetadata.fltsfromperiod.replace(/\//g, "-"),
-            estimatedTime: null, //TODO: map with future received data
-            time: o.smetadata.std,
-            timestamp: o.smetadata.departure_timestamp,
-            airport: {
-              iataCode: o.smetadata.fromdestination,
-              name: this.getAirportOrDefault(o.smetadata.fromdestination).name,
-              gate: null, //TODO: map with future received data
-              coordinates: this.getAirportOrDefault(o.smetadata.fromdestination).pos,
-            },
-          },
-          arrival: {
-            date: o.smetadata.fltstoperiod.replace(/\//g, "-"),
-            estimatedTime: null, //TODO: map with future received data
-            time: o.smetadata.sta,
-            timestamp: o.smetadata.arrival_timestamp,
-            airport: {
-              iataCode: o.smetadata.todestination,
-              name: this.getAirportOrDefault(o.smetadata.todestination).name,
-              gate: null, //TODO: map with future received data
-              coordinates: this.getAirportOrDefault(o.smetadata.todestination).pos,
-            },
-          },
-          status: o.smetadata.remark ? o.smetadata.remark : "SCHEDULED",
-          company: o.sorigin,
-          flightNumber: o.smetadata.fltnumber,
-          rates: rate ? { basic_adult_oneway_withtaxes: rate } : null,
-        };
+    if (!departureDT.isValid || !arrivalDT.isValid) continue;
 
-        let flightInfo = this.getFlightInfo(obj);
-        obj.flightInfo = flightInfo;
+    const departureDate = departureRaw.substring(0, 10);
+    const departureTime = departureRaw.substring(11, 16);
 
-        let k = this.getClusterIndexByDate(obj.departure.date);
-        if (k === false) {
-          continue; // skip it, is out of range
-        }
+    const arrivalDate = arrivalRaw.substring(0, 10);
+    const arrivalTime = arrivalRaw.substring(11, 16);
 
-        if (!parsedData[k]) {
-          parsedData[k] = [];
-        }
-        parsedData[k].push(obj);
-      }
+    let obj = {
+      departure: {
+        date: departureDate,
+        estimatedTime: null,
+        time: departureTime,
+        timestamp: departureDT.toSeconds(),
+        airport: {
+          iataCode: departureCode,
+          name: departureStop?.Detail?.en?.Title || departureCode,
+          gate: null,
+          coordinates: departureStop?.Geo?.position
+            ? [
+              departureStop.Geo.position.Longitude,
+              departureStop.Geo.position.Latitude,
+              ]
+            : null,
+        },
+      },
+      arrival: {
+        date: arrivalDate,
+        estimatedTime: null,
+        time: arrivalTime,
+        timestamp: arrivalDT.toSeconds(),
+        airport: {
+          iataCode: arrivalCode,
+          name: arrivalStop?.Detail?.en?.Title || arrivalCode,
+          gate: null,
+          coordinates: arrivalStop?.Geo?.position
+            ? [
+                arrivalStop.Geo.position.Longitude,
+                arrivalStop.Geo.position.Latitude,
+              ]
+            : null,
+        },
+      },
+      status: "SCHEDULED",
+      company: o?.Agency?.Shortname || o?.Source || "",
+      flightNumber: o?.Shortname || o?.Route?.Shortname || o?.Id || "-",
+      tripId: o?.Mapping?.skyalps?.TripID || null,
+      rates: null,
+      raw: o,
+    };
 
-      // sort by timestamps
-      for (let k in parsedData) {
-        parsedData[k].sort(this.sortByTimestamp);
-      }
+    obj.flightInfo = this.getFlightInfo(obj);
 
-      // This is not the best way if list change. Could be necessary to implement an unique binding key.
-      if (this.details.show) {
-        this.details.flight =
-          parsedData[this.selectedTimeIntervalIndex][this.details.flightIndex];
-      }
+    const k = this.getClusterIndexByDate(obj.departure.date);
 
-      return parsedData;
-    },
+    if (k === false) continue;
+
+    if (!parsedData[k]) {
+      parsedData[k] = [];
+    }
+
+    parsedData[k].push(obj);
+  }
+
+  for (let k in parsedData) {
+    parsedData[k].sort(this.sortByTimestamp);
+  }
+
+  return parsedData;
+},
     getClusterIndexByDate(date) {
       for (let k in this.calendarElements) {
         if (
@@ -757,138 +743,83 @@ export default {
 
       return false;
     },
-    async getData(whereCondition) {
-      //compile get parameters
-      let params = {
-        limit: "-1",
-        offset: "0",
-        shownull: "false",
-        distinct: "true",
-        where: whereCondition,
-        origin: "webcomp-flightdata",
-      };
-      params = new URLSearchParams(params).toString();
+    async getData(paramsObj = {}) {
+  let allItems = [];
+  let pageNumber = 1;
+  const pageSize = 500;
 
-      //make request
-      let data = await axios.get(this.options.restEndpoint + params);
-      return data;
+  while (true) {
+    const response = await axios.get(this.options.restEndpoint, {
+      params: {
+        ...paramsObj,
+        pagesize: pageSize,
+        pagenumber: pageNumber,
+        removenullvalues: false,
+        getasidarray: false,
+      },
+    });
+
+    const items = response.data?.Items || [];
+
+    allItems.push(...items);
+
+    if (items.length < pageSize) {
+      break;
+    }
+
+    pageNumber++;
+  }
+
+  return {
+    data: {
+      Items: allItems,
     },
-    async fetchSchedules() {
-      try {
-        // getting outward flights
-        //adding where conditions
-        let where = "";
-        if (this.airport && this.airport.value) {
-          let els = this.airport.value.split("|");
-          let airportOrCondition = "";
-          if (els.length > 1) {
-            airportOrCondition += "or(";
-            for (let i = 0; i < els.length; i++) {
-              if (i > 0) {
-                airportOrCondition += ",";
-              }
-              airportOrCondition +=
-                "smetadata.fromdestination.eq." +
-                els[i] +
-                ",smetadata.todestination.eq." +
-                els[i];
-            }
-            airportOrCondition += ")";
-          } else {
-            airportOrCondition =
-              "or(smetadata.fromdestination.eq." +
-              this.airport.value +
-              ",smetadata.todestination.eq." +
-              this.airport.value +
-              ")";
-          }
-          where = this.addWhereCondition(where, airportOrCondition);
-        } else {
-          if (
-            !this.airport ||
-            this.airport.label != this.airportSelectFieldValue
-          ) {
-            // check if are there a flight number
-            let airportSelectFieldValue = this.airportSelectFieldValue;
-            if (airportSelectFieldValue) {
-              where = this.addWhereCondition(
-                where,
-                "smetadata.fltnumber.eq." + airportSelectFieldValue
-              );
-            }
-          }
-        }
-        where = this.addWhereCondition(
-          where,
-          "or(smetadata.fromdestination.eq." +
-            this.localAirportKey +
-            ",smetadata.todestination.eq." +
-            this.localAirportKey +
-            ")"
-        );
+  };
+},
+   async fetchSchedules() {
+  try {
+    const data = await this.getData({
+      source: "skyalps",
+    });
 
-        // handle dates
-        let calendarElement =
-          this.calendarElements[this.selectedTimeIntervalIndex];
-        if (calendarElement) {
-          let minCenterDate = calendarElement.minDate;
-          let maxCenterDate = calendarElement.maxDate;
+    const items = data.data.Items || [];
 
-          //calculates min max
-          let departureLowerDate = minCenterDate;
-          let departureUpperDate = maxCenterDate;
-          if (this.period.value == "month") {
-            departureLowerDate = minCenterDate.minus({
-              days: (Math.ceil(this.clusterNumber.month / 2) + 1) * 30,
-            });
-            departureUpperDate = maxCenterDate.plus({
-              days: (Math.ceil(this.clusterNumber.month / 2) - 1) * 30,
-            });
-            departureUpperDate = departureUpperDate.plus({ day: 1 });
-          } else if (this.period.value == "week") {
-            departureLowerDate = minCenterDate.minus({
-              days: (Math.ceil(this.clusterNumber.week / 2) + 1) * 7,
-            });
-            departureUpperDate = maxCenterDate.plus({
-              days: (Math.ceil(this.clusterNumber.week / 2) - 1) * 7,
-            });
-            departureUpperDate = departureUpperDate.plus({ day: 1 });
-          } else {
-            departureLowerDate = minCenterDate.minus({
-              days: Math.ceil(this.clusterNumber.day / 2) + 1,
-            });
-            departureUpperDate = maxCenterDate.plus({
-              days: Math.ceil(this.clusterNumber.day / 2),
-            });
-          }
-          where = this.addWhereCondition(
-            where,
-            "smetadata.departure_timestamp.gt." +
-              departureLowerDate.toMillis() / 1000
-          );
-          where = this.addWhereCondition(
-            where,
-            "smetadata.departure_timestamp.lt." +
-              departureUpperDate.toMillis() / 1000
-          );
-        } else {
-          let now = new Date();
-          where = this.addWhereCondition(
-            where,
-            "smetadata.departure_timestamp.gt." + now.getTime() / 1000
-          ); //TDO: decide how to handle it.
-        }
+    let selectedAirports = [];
 
-        where = "and(" + where + ")";
+    if (this.airport && this.airport.value) {
+      selectedAirports = this.airport.value.split("|");
+    }
 
-        let data = await this.getData(where);
+    const filteredItems = items.filter((o) => {
+      if (!o.StopTimes || o.StopTimes.length < 2) return false;
 
-        //parse received data
-        this.flights = this.parseData(data);
-      } catch (error) {
-        console.error(error);
-      }
-    },
+      const departureStop = o.StopTimes[0];
+      const arrivalStop = o.StopTimes[o.StopTimes.length - 1];
+
+      const departureCode = departureStop.Shortname || "";
+      const arrivalCode = arrivalStop.Shortname || "";
+
+      const matchesLocalAirport =
+        departureCode === this.localAirportKey ||
+        arrivalCode === this.localAirportKey;
+
+      const matchesSelectedAirport =
+        selectedAirports.length === 0 ||
+        selectedAirports.includes(departureCode) ||
+        selectedAirports.includes(arrivalCode);
+
+      return matchesLocalAirport && matchesSelectedAirport;
+    });
+
+    this.flights = this.parseData({
+      data: {
+        Items: filteredItems,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+},
     sortByTimestamp: function (a, b) {
       if (a.departure.timestamp < b.departure.timestamp) {
         return -1;
