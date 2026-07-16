@@ -505,6 +505,22 @@ export default {
       //     this.search()
       // }
     },
+
+    resolveTypedAirport() {
+      if (!this.airportSelectFieldValue) return;
+
+      const typed = this.airportSelectFieldValue.trim().toUpperCase();
+
+      if (this.airports[typed]) {
+        this.airport = {
+          value: typed,
+          label: `${this.airports[typed].name} (${typed})`
+        };
+
+        this.airportSelectFieldValue = `${this.airports[typed].name} (${typed})`;
+      }
+    },
+
     airlineLink(flight) {
       let dep = DateTime.fromFormat(flight.departure.date, "yyyy-LL-dd", "UTC");
       let loc =
@@ -615,6 +631,9 @@ export default {
       this.search();
     },
     async search() {
+
+        this.resolveTypedAirport();
+
       //form validation
       let formValidationResponse = this.validateForm();
       if (formValidationResponse.result == false) {
@@ -743,7 +762,18 @@ export default {
 
       return false;
     },
-    async getData(paramsObj = {}) {
+async getData(paramsObj = {}) {
+  const cacheKey = JSON.stringify(paramsObj);
+
+  // Return cached data if available
+  if (
+    this.tripDataCache &&
+    this.tripDataCache.key === cacheKey
+  ) {
+    console.log("Using cached Trip data");
+    return this.tripDataCache.data;
+  }
+
   let allItems = [];
   let pageNumber = 1;
   const pageSize = 500;
@@ -770,11 +800,21 @@ export default {
     pageNumber++;
   }
 
-  return {
+  const result = {
     data: {
       Items: allItems,
     },
   };
+
+  // Store in cache
+  this.tripDataCache = {
+    key: cacheKey,
+    data: result,
+  };
+
+  console.log("Cached", allItems.length, "trips");
+
+  return result;
 },
    async fetchSchedules() {
   try {
@@ -1109,7 +1149,10 @@ export default {
   //on mount component
   mounted: function () {
     //init local airport
-    this.localAirportKey = this.options.localAirport;
+    this.localAirportKey = (
+    this.options.localAirport || "BZO"
+    ).toUpperCase();
+
     if (!this.airports[this.localAirportKey]) {
       this.localAirportKey = "BZO";
     }
@@ -1162,6 +1205,7 @@ export default {
         week: 13,
         month: 7,
       },
+      tripDataCache: null,
       period: { label: "Day", value: "day" },
       selectedTimeIntervalIndex: 0,
 
